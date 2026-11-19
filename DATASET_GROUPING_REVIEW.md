@@ -1,8 +1,8 @@
 # Dataset grouping audit
 
-**Status as of 19 November 2026: patient-level grouping is not confirmed.**
+**Status as of 19 November 2026: source confirmed by the user; patient-level grouping is not confirmed.** The user confirmed that the supplied archive came from the Kaggle listing linked below.
 
-The uploaded path slug matches Kaggle's `eye-diseases-classification` listing. That listing describes a four-class retinal-image collection assembled from multiple sources, naming IDRiD, “Ocular recognition,” and HRF among them. It does not provide a per-image source key or a subject-ID manifest. [1]
+The confirmed Kaggle listing describes a four-class retinal-image collection assembled from multiple sources, naming IDRiD, “Ocular recognition,” and HRF among them. It does not provide a per-image source key or a subject-ID manifest. [1]
 
 The original ODIR-2019 documentation says its records cover 5,000 patients with color fundus photographs of both eyes. It states that ODIR labels are based on both eye images and patient age, and that a patient may have one or more labels. A separate Scientific Reports study likewise describes 10,000 ODIR photographs from 5,000 patients. This confirms patient-level pairing for ODIR itself, but it does **not** prove that every numeric `_left`/`_right` filename in this mixed-source Kaggle derivative is an ODIR patient ID. [2] [3]
 
