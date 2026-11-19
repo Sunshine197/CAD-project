@@ -116,6 +116,7 @@ class EyeDiseasePredictor:
                     "dataset_policy": report.get("dataset_policy"),
                     "split_policy": report.get("split_policy"),
                     "group_policy": report.get("group_policy"),
+                    "subject_grouping_status": "Filename-stem grouping only; subject identity and patient-level split independence are not verified for this mixed-source archive.",
                     "split_sizes": report.get("split_sizes"),
                     "training_summary": {
                         key: report.get("training", {}).get(key)
@@ -187,6 +188,8 @@ class EyeDiseasePredictor:
             "limitations": [
                 "Research prototype; not a confirmed diagnosis or substitute for clinician review.",
                 "Only cataract, glaucoma, and normal are represented by this classifier.",
+                "Patient-level split independence is not verified; filename stems are only a proxy for subject identity in the mixed-source dataset.",
+                "Two exact image copies were found under different class labels in the supplied dataset; the label conflict may affect evaluation.",
                 "Temperature scaling improved aggregate internal-test NLL and ECE, but does not make these scores clinical probabilities.",
                 "Performance may differ for images, devices, populations, or settings outside the evaluation data.",
             ],

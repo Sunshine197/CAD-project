@@ -45,6 +45,8 @@ class ReportFlowTests(unittest.TestCase):
         self.assertIn("Not provided.", text)
         self.assertIn("not establish or exclude disease", text)
         self.assertIn("not clinical probabilities", text)
+        self.assertIn("patient-level independence is unknown", text)
+        self.assertIn("label-quality concern", text)
         self.assertIn("Glaucoma: 20.0%", text)
 
     def test_dr7_payload_includes_full_output_but_no_image_identifiers_or_date(self):

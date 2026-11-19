@@ -46,7 +46,7 @@ The uploaded archive contained 938 cataract JPGs, 906 glaucoma JPGs, and 1,074 n
 
 ## Fresh group-aware training when original split IDs are missing
 
-The existing checkpoint cannot be fairly evaluated on a newly created split of the same source images. `train_fresh.py` provides a clean internal alternative: it starts from ImageNet ResNet50 weights (not the existing CAD checkpoint), reserves about 60%/10%/10%/20% for training/model selection/calibration/final test, and groups `_left`/`_right` images by filename ID so paired images do not cross partitions. It writes the new checkpoint and aggregate metrics to a local output directory; split records and image data are not added to GitHub.
+The existing checkpoint cannot be fairly evaluated on a newly created split of the same source images. `train_fresh.py` provides an internal alternative: it starts from ImageNet ResNet50 weights (not the existing CAD checkpoint), reserves about 60%/10%/10%/20% for training/model selection/calibration/final test, and keeps matching filename stems together after removing `_left`/`_right`. This is a **filename-grouped split, not a confirmed patient-level split**. The matching Kaggle dataset page describes images from multiple sources and the supplied archive has no source/patient manifest, so the filename-to-patient assumption remains unverified. It writes the new checkpoint and aggregate metrics to a local output directory; split records and image data are not added to GitHub.
 
 ```bash
 python train_fresh.py \
@@ -56,7 +56,7 @@ python train_fresh.py \
   --device cpu
 ```
 
-This produces a new internally evaluated prototype, not external or clinical validation. Filename-derived groups are a proxy for subjects and should be confirmed against the dataset documentation. For this run, the grouped final-test accuracy was 85.45%; class recall was 95.21% for cataract, 80.77% for glaucoma, and 80.84% for normal. Temperature scaling fitted on the separate internal calibration partition used T=1.55181; on the final-test partition it changed NLL from 0.36455 to 0.34266 and ECE from 0.05156 to 0.03797, while accuracy remained 85.45%. These are internal results on the supplied dataset only. Full aggregate metrics are in the local, ignored `fresh_group_split_run/fresh_group_split_metrics.json`; neither the fresh weights nor dataset/split records are published.
+This produces a new internally evaluated prototype, not external or clinical validation. For this run, the filename-stem-grouped final-test accuracy was 85.45%; class recall was 95.21% for cataract, 80.77% for glaucoma, and 80.84% for normal. Temperature scaling fitted on the separate internal calibration partition used T=1.55181; on the final-test partition it changed NLL from 0.36455 to 0.34266 and ECE from 0.05156 to 0.03797, while accuracy remained 85.45%. These are internal results on the supplied dataset only. Two exact image copies were found under different class labels; both copies were kept in the same split, but the conflicting labels remain a data-quality concern. The public source describes a mixed-source dataset and no per-image patient mapping was supplied, so this cannot be called patient-independent evaluation. See [the grouping audit](DATASET_GROUPING_REVIEW.md). Full aggregate metrics are in the local, ignored `fresh_group_split_run/fresh_group_split_metrics.json`; neither the fresh weights nor dataset/split records are published.
 
 ## Validation performed
 

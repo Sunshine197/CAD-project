@@ -72,6 +72,6 @@ def build_report(result: dict[str, Any], examination: dict[str, Any] | None = No
         "- Have the image and classifier output reviewed by a qualified eye-care professional in the context of a comprehensive clinical assessment.",
         "- Do not use this output alone to make diagnostic or treatment decisions.",
         "",
-        "Limitations: Research prototype only; not a medical device, confirmed diagnosis, or substitute for professional judgment. The model covers only the listed classes. Internal dataset calibration does not establish clinical calibration or performance on external data.",
+        "Limitations: Research prototype only; not a medical device, confirmed diagnosis, or substitute for professional judgment. The dataset split groups filename stems, not verified patient IDs; patient-level independence is unknown. Exact duplicate images in different class folders create a label-quality concern. The model covers only the listed classes. Internal dataset calibration does not establish clinical calibration or performance on external data.",
         f"Model checkpoint SHA-256: {result.get('metadata', {}).get('checkpoint_sha256', 'Not available.')}",
     ])

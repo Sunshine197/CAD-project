@@ -2,8 +2,9 @@
 
 This deliberately does NOT initialize from the supplied CAD checkpoint because
 its original split assignments are unavailable. It starts from ImageNet weights,
-keeps paired left/right IDs in one partition, uses separate validation and
+keeps matching filename stems in one partition, uses separate validation and
 calibration partitions, and evaluates the test partition only after training.
+Filename stems are not verified patient IDs for the supplied mixed-source dataset.
 Only JPGs are included to match the original notebook's data loading.
 """
 from __future__ import annotations
@@ -83,8 +84,8 @@ def discover_entries(root: Path):
             raise FileNotFoundError(f"Missing class folder: {class_dir}")
         for path in sorted(class_dir.glob("*.jpg")):
             stem = path.stem
-            # Eye-image filenames use IDs ending in _left/_right. Keep both eyes
-            # and any same-ID cross-class records in the same split conservatively.
+            # Remove the eye suffix and keep matching filename stems together.
+            # The archive has no source/patient map, so these are not verified subjects.
             group = stem.rsplit("_", 1)[0] if stem.endswith(("_left", "_right")) else stem
             entries.append((path, label, group))
     if not entries:
@@ -96,7 +97,7 @@ def make_group_splits(entries):
     y = np.asarray([e[1] for e in entries], dtype=int)
     groups = np.asarray([e[2] for e in entries])
     x = np.arange(len(entries))
-    # One fifth (approximately 20%) of patient/ID groups is reserved as final test.
+    # One fifth (approximately 20%) of filename-stem groups is reserved as final test.
     outer = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=421)
     trainval_idx, test_idx = next(outer.split(x, y, groups))
     # Remaining 80% is split into 8 approximately equal folds: one validation,
@@ -304,8 +305,8 @@ def main():
         "experiment": "fresh ImageNet-initialized ResNet50; no initialization from prior CAD checkpoint",
         "classes_in_logit_order": CLASSES,
         "dataset_policy": "Only .jpg files; RGB conversion and notebook preprocessing; uploaded PNGs excluded.",
-        "split_policy": "Group-aware image-ID split: approximately 60% train, 10% model-selection validation, 10% temperature calibration, 20% final test.",
-        "group_policy": "Filename stem with _left/_right suffix removed; same identifier kept within one split across class folders.",
+        "split_policy": "Filename-stem-grouped split: approximately 60% train, 10% model-selection validation, 10% temperature calibration, 20% final test; patient-level independence is unverified.",
+        "group_policy": "Filename stem with _left/_right suffix removed; same stem kept within one split across class folders. These stems are not verified subject identifiers for this mixed-source archive.",
         "split_sizes": split_sizes,
         "class_counts": split_counts,
         "unique_group_counts": split_groups,
@@ -321,7 +322,8 @@ def main():
         "checkpoint_sha256": sha256_file(checkpoint),
         "limitations": [
             "Internal evaluation on a single supplied dataset; no external or clinical validation.",
-            "Filename-derived IDs are treated as subject groups because filenames have left/right eye suffixes; source semantics should be confirmed by dataset documentation.",
+            "Filename-stem grouping is a proxy only; the mixed-source archive has no per-image source/patient map, so patient-level independence is not verified.",
+            "Two exact image copies were found in different class folders; their label conflict requires source review.",
             "Calibration is fit on one finite calibration partition; calibration uncertainty remains and scores are not clinical probabilities.",
             "No threshold for clinical decision-making is established; clinician review is required.",
         ],
