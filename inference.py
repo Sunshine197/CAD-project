@@ -1,11 +1,13 @@
 """Inference helper matching image-based-eye-diseases-detection-final.ipynb.
 
-This is a research prototype, not a medical device or diagnostic system. The
-softmax outputs are model scores; they have not been shown to be calibrated.
+This is a research prototype, not a medical device or diagnostic system. Scores
+are not clinical probabilities; internal temperature scaling is not clinical
+calibration.
 """
 from __future__ import annotations
 
 import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
@@ -67,7 +69,12 @@ def build_transform() -> transforms.Compose:
 
 
 class EyeDiseasePredictor:
-    def __init__(self, checkpoint_path: str | Path, device: str | None = None) -> None:
+    def __init__(
+        self,
+        checkpoint_path: str | Path,
+        device: str | None = None,
+        temperature: float | None = None,
+    ) -> None:
         self.checkpoint_path = Path(checkpoint_path).expanduser().resolve()
         if not self.checkpoint_path.is_file():
             raise FileNotFoundError(f"Checkpoint not found: {self.checkpoint_path}")
@@ -87,23 +94,86 @@ class EyeDiseasePredictor:
         self.model.to(self.device).eval()
         self.transform = build_transform()
         self.checkpoint_sha256 = _sha256(self.checkpoint_path)
+        calibration_report = self.checkpoint_path.parent / "fresh_group_split_metrics.json"
+        self.training_evaluation: dict[str, Any] | None = None
+        if temperature is not None:
+            self.temperature = float(temperature)
+            self.calibration = {
+                "status": "temperature supplied by caller",
+                "method": "temperature scaling",
+                "temperature": self.temperature,
+            }
+        elif calibration_report.is_file():
+            report = json.loads(calibration_report.read_text(encoding="utf-8"))
+            if report.get("checkpoint_sha256") == self.checkpoint_sha256:
+                self.temperature = float(report["calibration"]["temperature"])
+                def summary(metrics: dict[str, Any]) -> dict[str, float]:
+                    fields = ("accuracy", "negative_log_likelihood", "multiclass_brier_score", "top_label_ece_15_bins")
+                    return {field: float(metrics[field]) for field in fields if field in metrics}
+
+                self.training_evaluation = {
+                    "experiment": report.get("experiment"),
+                    "dataset_policy": report.get("dataset_policy"),
+                    "split_policy": report.get("split_policy"),
+                    "group_policy": report.get("group_policy"),
+                    "split_sizes": report.get("split_sizes"),
+                    "training_summary": {
+                        key: report.get("training", {}).get(key)
+                        for key in ("epochs_requested", "epochs_completed", "best_validation_accuracy")
+                    },
+                    "calibration_partition_raw_metrics": summary(report["calibration"]["calibration_raw"]),
+                    "calibration_partition_temperature_scaled_metrics": summary(report["calibration"]["calibration_scaled"]),
+                    "final_test_raw_metrics": summary(report["final_test_raw"]),
+                    "final_test_temperature_scaled_metrics": summary(report["final_test_temperature_scaled"]),
+                    "interpretation": "Aggregate internal-dataset results only; not external or clinical validation.",
+                }
+                self.calibration = {
+                    "status": "internally calibrated on a reserved dataset partition",
+                    "method": report["calibration"]["method"],
+                    "temperature": self.temperature,
+                    "report_file": calibration_report.name,
+                    "evaluation_note": "Internal split only; not clinical calibration.",
+                }
+            else:
+                self.temperature = 1.0
+                self.calibration = {
+                    "status": "calibration metadata did not match this checkpoint; raw softmax only",
+                    "method": None,
+                    "temperature": 1.0,
+                }
+        else:
+            self.temperature = 1.0
+            self.calibration = {
+                "status": "not established; raw softmax only",
+                "method": None,
+                "temperature": 1.0,
+            }
+        if self.temperature <= 0:
+            raise ValueError("temperature must be greater than zero")
 
     @torch.inference_mode()
     def predict(self, image: Image.Image) -> dict[str, Any]:
-        """Return all class softmax scores and traceable model metadata."""
+        """Return every class's raw and temperature-scaled score plus provenance."""
         image = image.convert("RGB")
         tensor = self.transform(image).unsqueeze(0).to(self.device)
         logits = self.model(tensor)[0]
-        scores = torch.softmax(logits, dim=0).detach().cpu().tolist()
+        raw_scores = torch.softmax(logits, dim=0).detach().cpu().tolist()
+        adjusted_scores = torch.softmax(logits / self.temperature, dim=0).detach().cpu().tolist()
         ranked = sorted(
-            ({"class": name, "score": float(score)} for name, score in zip(CLASS_NAMES, scores)),
+            ({"class": name, "score": float(score)} for name, score in zip(CLASS_NAMES, adjusted_scores)),
+            key=lambda item: item["score"], reverse=True,
+        )
+        raw_ranked = sorted(
+            ({"class": name, "score": float(score)} for name, score in zip(CLASS_NAMES, raw_scores)),
             key=lambda item: item["score"], reverse=True,
         )
         return {
             "predictions": ranked,
+            "raw_softmax_scores": raw_ranked,
             "top_prediction": ranked[0]["class"],
             "top_score": ranked[0]["score"],
-            "score_semantics": "softmax model score; calibration has not been established",
+            "score_semantics": "Temperature-scaled model scores; empirical calibration only on the supplied internal dataset, not clinical probabilities.",
+            "calibration": self.calibration,
             "metadata": {
                 "model": MODEL_NAME,
                 "classes_in_logit_order": CLASS_NAMES,
@@ -112,11 +182,12 @@ class EyeDiseasePredictor:
                 "checkpoint_sha256": self.checkpoint_sha256,
                 "device": str(self.device),
                 "input_image_size_px": list(image.size),
+                "training_evaluation": self.training_evaluation,
             },
             "limitations": [
                 "Research prototype; not a confirmed diagnosis or substitute for clinician review.",
                 "Only cataract, glaucoma, and normal are represented by this classifier.",
-                "Softmax scores are not validated or calibrated clinical probabilities.",
+                "Temperature scaling improved aggregate internal-test NLL and ECE, but does not make these scores clinical probabilities.",
                 "Performance may differ for images, devices, populations, or settings outside the evaluation data.",
             ],
         }

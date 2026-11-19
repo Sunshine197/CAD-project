@@ -2,11 +2,20 @@
 
 This folder contains a reusable inference module reconstructed from `image-based-eye-diseases-detection-final.ipynb` and the supplied `best_eye_disease_model.pth` checkpoint.
 
-## Install
+## Install and launch the interactive app
 
 ```bash
 python -m pip install -r requirements.txt
+streamlit run app.py
 ```
+
+Choose a checkpoint in the sidebar (the fresh group-split checkpoint is available locally as `fresh_group_split_run/fresh_group_split_model.pth`, but is not included in the public repository). Upload an image to see every class score and model provenance, preview a deterministic report, and download it as text. The app does not collect patient names or dates of birth.
+
+The local deterministic report is the default and is composed from the classifier output plus examination fields explicitly entered by the user. Missing fields are marked “Not provided.” Recommendations are limited to clinician review. The report does not invent symptoms or exam findings and does not treat the classifier prediction as a confirmed diagnosis.
+
+### Optional Dr7 draft
+
+The app includes an explicitly opt-in Dr7 medical chat completion call. It sends the full classifier output, including all class scores and model/calibration/preprocessing/checkpoint metadata, plus modality and laterality when entered. It does **not** send the image, patient name, date of birth, examination date, device field, or original filename. The API key is supplied for the request and is not stored by the app. See [Dr7 integration notes](DR7_INTEGRATION_NOTES.md) and review Dr7's current terms and privacy practices before use. Dr7's published disclaimer describes its models as research-purpose and not clinical-grade. An LLM response is shown as an unverified draft requiring clinician review; no prompt or LLM can guarantee a hallucination-free report.
 
 ## Run a prediction
 
@@ -47,7 +56,7 @@ python train_fresh.py \
   --device cpu
 ```
 
-This produces a new internally evaluated prototype, not external or clinical validation. Filename-derived groups are a proxy for subjects and should be confirmed against the dataset documentation.
+This produces a new internally evaluated prototype, not external or clinical validation. Filename-derived groups are a proxy for subjects and should be confirmed against the dataset documentation. For this run, the grouped final-test accuracy was 85.45%; class recall was 95.21% for cataract, 80.77% for glaucoma, and 80.84% for normal. Temperature scaling fitted on the separate internal calibration partition used T=1.55181; on the final-test partition it changed NLL from 0.36455 to 0.34266 and ECE from 0.05156 to 0.03797, while accuracy remained 85.45%. These are internal results on the supplied dataset only. Full aggregate metrics are in the local, ignored `fresh_group_split_run/fresh_group_split_metrics.json`; neither the fresh weights nor dataset/split records are published.
 
 ## Validation performed
 
@@ -55,4 +64,4 @@ The supplied checkpoint loaded successfully with strict state-dictionary matchin
 
 ## Important limitations
 
-The softmax scores are not established as calibrated probabilities until evaluation has been run and reviewed. The original notebook reports 88.53% test accuracy on its own held-out test split; this has not been independently reproduced here. The checkpoint and notebook do not establish external clinical validation or clinical utility. The evaluation split is image-level, and patient-level independence cannot be verified from the notebook/data layout. Do not use this prototype as a confirmed diagnosis or substitute for a qualified clinician's judgment.
+The fresh model's temperature was fitted on an internal calibration partition and its grouped final test result is documented in `fresh_group_split_run/fresh_group_split_metrics.json` locally. Temperature scaling improved aggregate internal test NLL and ECE but does not establish clinical calibration or external validity. Scores are model scores, not clinically validated disease probabilities. The original notebook reports 88.53% test accuracy on its own split; its original sample assignments were unavailable, so that result was not independently reproduced. This research prototype is not a medical device or confirmed diagnosis and must not substitute for a qualified clinician's judgment. Do not use it for clinical decisions.

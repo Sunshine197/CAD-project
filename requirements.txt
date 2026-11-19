@@ -2,3 +2,4 @@ torch
 torchvision
 Pillow
 scikit-learn
+streamlit
