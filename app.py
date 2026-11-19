@@ -82,11 +82,11 @@ st.divider()
 st.subheader("Optional Dr7 AI draft")
 st.write("The deterministic report above is the default. Dr7 can optionally produce a separate language-model draft using the complete score and metadata object.")
 st.warning(
-    "When enabled, the app sends the classifier scores, calibration status, model/preprocessing/checkpoint metadata, and non-identifying examination fields to Dr7. It does not send the image or patient name/date of birth. Dr7's published disclaimer describes the models as research-purpose and not clinical-grade. Review Dr7's current privacy and service terms before sending any sensitive or identifiable information.",
+    "Dr7's published terms restrict the service to research/education and prohibit clinical decision use and processing real patient data. Its API FAQ discusses a signed data-processing agreement for directly identifiable information, but that does not clearly resolve the broader restrictions. The app sends classifier scores and metadata as health-related text even though it does not send the image or direct identifiers. Do not send real-patient data or use the draft for patient care. The published policy describes query/response deletion within 24 hours and anonymized technical logs retained for 90 days; API-specific details need written confirmation.",
     icon="⚠️",
 )
 with st.form("dr7_form"):
-    enabled = st.checkbox("I understand and want to send this text-only payload to Dr7 for an unverified draft.")
+    enabled = st.checkbox("I confirm this request contains no real-patient data or direct identifiers, is for research/education only, and will not be used for clinical decisions.")
     api_key = st.text_input("Dr7 API key", type="password", help="Used only for this request; not stored in this app or repository.")
     model_name = st.selectbox("Dr7 model", ["medgemma-4b-it", "medgemma-27b-it"], index=0)
     submitted = st.form_submit_button("Generate Dr7 draft")
@@ -107,4 +107,4 @@ if submitted:
         except Exception as exc:
             st.error(f"Dr7 request failed: {exc}")
 
-st.caption("No patient name or date of birth is collected. For an academic demonstration only; do not upload identifiable patient data.")
+st.caption("No patient name or date of birth is collected. This is an academic research prototype, not a clinical tool. Do not send real-patient data to Dr7 under its currently published terms, even if direct identifiers are omitted.")
