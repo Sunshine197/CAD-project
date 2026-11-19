@@ -35,6 +35,20 @@ The script creates a deterministic stratified 60/20/20 image-level re-split (`ra
 
 The uploaded archive contained 938 cataract JPGs, 906 glaucoma JPGs, and 1,074 normal JPGs, matching the notebook's JPG counts; additional PNG files are ignored to match training preprocessing. The sorted-path re-split produced 84.93% test accuracy, compared with 88.53% recorded in the notebook. Because these differ, the original test assignments have not been reproduced. Do not cite the re-split result as the model's held-out test performance. For valid calibration/evaluation, use the original validation/test sample assignments or a genuinely independent, appropriately governed dataset.
 
+## Fresh group-aware training when original split IDs are missing
+
+The existing checkpoint cannot be fairly evaluated on a newly created split of the same source images. `train_fresh.py` provides a clean internal alternative: it starts from ImageNet ResNet50 weights (not the existing CAD checkpoint), reserves about 60%/10%/10%/20% for training/model selection/calibration/final test, and groups `_left`/`_right` images by filename ID so paired images do not cross partitions. It writes the new checkpoint and aggregate metrics to a local output directory; split records and image data are not added to GitHub.
+
+```bash
+python train_fresh.py \
+  --dataset /path/to/dataset \
+  --output-dir fresh_group_split_run \
+  --epochs 25 \
+  --device cpu
+```
+
+This produces a new internally evaluated prototype, not external or clinical validation. Filename-derived groups are a proxy for subjects and should be confirmed against the dataset documentation.
+
 ## Validation performed
 
 The supplied checkpoint loaded successfully with strict state-dictionary matching using the reconstructed architecture. A smoke test on a synthetic blank image confirmed that inference returns all three classes and scores summing to approximately 1.0. That synthetic-image output is **not** a medical prediction and is not used as performance evidence.
