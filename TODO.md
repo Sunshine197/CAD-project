@@ -8,5 +8,6 @@
 - [ ] Obtain an original per-image source/patient-ID manifest if available; otherwise continue to describe the existing test results as filename-grouped internal results, not patient-level validation. Resolve how the two identical image copies with different class labels should be handled before relying on class-specific metrics.
 - [x] Prepare a clinician-review checklist covering intended-use limits, labels, scores, report wording, recommendations, dataset quality, validation, and optional LLM output (`CLINICIAN_REVIEW_CHECKLIST.md`).
 - [ ] Obtain a qualified eye-care professional's review using the checklist; do not claim approval before feedback is received.
+- [x] Smoke-test the interactive GUI with one local supplied-dataset image per retained class. Confirm image upload, three class-score bars, raw/calibrated provenance, all five report sections, report download control, and no Dr7 draft without submitting the opt-in form. This checks app behavior only, not medical accuracy. See `GUI_SMOKE_TEST.md`.
 - [ ] Obtain and assess applicable Dr7 privacy, service, and data-processing terms before any use with sensitive/identifiable information.
 - [ ] Arrange independent clinical review and appropriately governed external validation before any clinical-use claims or deployment.

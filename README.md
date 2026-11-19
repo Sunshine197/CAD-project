@@ -13,6 +13,8 @@ Choose a checkpoint in the sidebar (the fresh group-split checkpoint is availabl
 
 The local deterministic report is the default and is composed from the classifier output plus examination fields explicitly entered by the user. Missing fields are marked “Not provided.” Recommendations are limited to clinician review. The report does not invent symptoms or exam findings and does not treat the classifier prediction as a confirmed diagnosis.
 
+The local upload flow was smoke-tested with one supplied-dataset example from each retained class; this is not a medical accuracy evaluation. See [GUI smoke-test notes](GUI_SMOKE_TEST.md).
+
 ### Optional Dr7 draft
 
 The app includes an explicitly opt-in Dr7 medical chat completion call. It sends the full classifier output, including all class scores and model/calibration/preprocessing/checkpoint metadata, plus modality and laterality when entered. It does **not** send the image, patient name, date of birth, examination date, device field, or original filename. The API key is supplied for the request and is not stored by the app. See [Dr7 integration notes](DR7_INTEGRATION_NOTES.md) and review Dr7's current terms and privacy practices before use. Dr7's published disclaimer describes its models as research-purpose and not clinical-grade. An LLM response is shown as an unverified draft requiring clinician review; no prompt or LLM can guarantee a hallucination-free report.
