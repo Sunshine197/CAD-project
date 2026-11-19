@@ -1,0 +1,328 @@
+{
+  "evaluation_protocol": "Exploratory deterministic re-split of current JPG files (lexicographically sorted paths); stratified 60/20/20, random_state=42; temperature fitted on this re-split's validation only. This is not verified to match the notebook's original sample assignments.",
+  "classes_in_logit_order": [
+    "cataract",
+    "glaucoma",
+    "normal"
+  ],
+  "split_sizes": {
+    "train": 1750,
+    "validation": 584,
+    "test": 584
+  },
+  "calibration": {
+    "method": "single scalar temperature scaling",
+    "temperature_fit_on_validation": 1.2490406036376953,
+    "validation_raw": {
+      "accuracy": 0.8476027397260274,
+      "nll": 0.4107959568500519,
+      "multiclass_brier_score": 0.22827341036885615,
+      "top_label_ece_15_bins": 0.046845270754539786,
+      "confusion_matrix_rows_true_cols_predicted": [
+        [
+          170,
+          13,
+          5
+        ],
+        [
+          19,
+          129,
+          33
+        ],
+        [
+          7,
+          12,
+          196
+        ]
+      ],
+      "per_class": {
+        "cataract": {
+          "precision": 0.8673469387755102,
+          "recall": 0.9042553191489362,
+          "f1": 0.8854166666666666,
+          "support": 188
+        },
+        "glaucoma": {
+          "precision": 0.8376623376623377,
+          "recall": 0.712707182320442,
+          "f1": 0.7701492537313432,
+          "support": 181
+        },
+        "normal": {
+          "precision": 0.8376068376068376,
+          "recall": 0.9116279069767442,
+          "f1": 0.8730512249443207,
+          "support": 215
+        }
+      },
+      "classification_report": {
+        "cataract": {
+          "precision": 0.8673469387755102,
+          "recall": 0.9042553191489362,
+          "f1-score": 0.8854166666666666,
+          "support": 188.0
+        },
+        "glaucoma": {
+          "precision": 0.8376623376623377,
+          "recall": 0.712707182320442,
+          "f1-score": 0.7701492537313432,
+          "support": 181.0
+        },
+        "normal": {
+          "precision": 0.8376068376068376,
+          "recall": 0.9116279069767442,
+          "f1-score": 0.8730512249443207,
+          "support": 215.0
+        },
+        "accuracy": 0.8476027397260274,
+        "macro avg": {
+          "precision": 0.8475387046815618,
+          "recall": 0.8428634694820407,
+          "f1-score": 0.842872381780777,
+          "support": 584.0
+        },
+        "weighted avg": {
+          "precision": 0.8471979070071046,
+          "recall": 0.8476027397260274,
+          "f1-score": 0.8451393178454373,
+          "support": 584.0
+        }
+      }
+    },
+    "validation_temperature_scaled": {
+      "accuracy": 0.8476027397260274,
+      "nll": 0.39964744448661804,
+      "multiclass_brier_score": 0.22567800246897735,
+      "top_label_ece_15_bins": 0.02496814544070258,
+      "confusion_matrix_rows_true_cols_predicted": [
+        [
+          170,
+          13,
+          5
+        ],
+        [
+          19,
+          129,
+          33
+        ],
+        [
+          7,
+          12,
+          196
+        ]
+      ],
+      "per_class": {
+        "cataract": {
+          "precision": 0.8673469387755102,
+          "recall": 0.9042553191489362,
+          "f1": 0.8854166666666666,
+          "support": 188
+        },
+        "glaucoma": {
+          "precision": 0.8376623376623377,
+          "recall": 0.712707182320442,
+          "f1": 0.7701492537313432,
+          "support": 181
+        },
+        "normal": {
+          "precision": 0.8376068376068376,
+          "recall": 0.9116279069767442,
+          "f1": 0.8730512249443207,
+          "support": 215
+        }
+      },
+      "classification_report": {
+        "cataract": {
+          "precision": 0.8673469387755102,
+          "recall": 0.9042553191489362,
+          "f1-score": 0.8854166666666666,
+          "support": 188.0
+        },
+        "glaucoma": {
+          "precision": 0.8376623376623377,
+          "recall": 0.712707182320442,
+          "f1-score": 0.7701492537313432,
+          "support": 181.0
+        },
+        "normal": {
+          "precision": 0.8376068376068376,
+          "recall": 0.9116279069767442,
+          "f1-score": 0.8730512249443207,
+          "support": 215.0
+        },
+        "accuracy": 0.8476027397260274,
+        "macro avg": {
+          "precision": 0.8475387046815618,
+          "recall": 0.8428634694820407,
+          "f1-score": 0.842872381780777,
+          "support": 584.0
+        },
+        "weighted avg": {
+          "precision": 0.8471979070071046,
+          "recall": 0.8476027397260274,
+          "f1-score": 0.8451393178454373,
+          "support": 584.0
+        }
+      }
+    }
+  },
+  "test_raw": {
+    "accuracy": 0.8493150684931506,
+    "nll": 0.40151721239089966,
+    "multiclass_brier_score": 0.21916134028175857,
+    "top_label_ece_15_bins": 0.040907138728932146,
+    "confusion_matrix_rows_true_cols_predicted": [
+      [
+        165,
+        14,
+        9
+      ],
+      [
+        23,
+        133,
+        25
+      ],
+      [
+        5,
+        12,
+        198
+      ]
+    ],
+    "per_class": {
+      "cataract": {
+        "precision": 0.8549222797927462,
+        "recall": 0.8776595744680851,
+        "f1": 0.8661417322834646,
+        "support": 188
+      },
+      "glaucoma": {
+        "precision": 0.8364779874213837,
+        "recall": 0.7348066298342542,
+        "f1": 0.7823529411764706,
+        "support": 181
+      },
+      "normal": {
+        "precision": 0.853448275862069,
+        "recall": 0.9209302325581395,
+        "f1": 0.8859060402684564,
+        "support": 215
+      }
+    },
+    "classification_report": {
+      "cataract": {
+        "precision": 0.8549222797927462,
+        "recall": 0.8776595744680851,
+        "f1-score": 0.8661417322834646,
+        "support": 188.0
+      },
+      "glaucoma": {
+        "precision": 0.8364779874213837,
+        "recall": 0.7348066298342542,
+        "f1-score": 0.7823529411764706,
+        "support": 181.0
+      },
+      "normal": {
+        "precision": 0.853448275862069,
+        "recall": 0.9209302325581395,
+        "f1-score": 0.8859060402684564,
+        "support": 215.0
+      },
+      "accuracy": 0.8493150684931506,
+      "macro avg": {
+        "precision": 0.8482828476920662,
+        "recall": 0.8444654789534929,
+        "f1-score": 0.8448002379094639,
+        "support": 584.0
+      },
+      "weighted avg": {
+        "precision": 0.84866315690865,
+        "recall": 0.8493150684931506,
+        "f1-score": 0.8474491895204636,
+        "support": 584.0
+      }
+    }
+  },
+  "test_temperature_scaled": {
+    "accuracy": 0.8493150684931506,
+    "nll": 0.39012494683265686,
+    "multiclass_brier_score": 0.21731252846770882,
+    "top_label_ece_15_bins": 0.03299023435540392,
+    "confusion_matrix_rows_true_cols_predicted": [
+      [
+        165,
+        14,
+        9
+      ],
+      [
+        23,
+        133,
+        25
+      ],
+      [
+        5,
+        12,
+        198
+      ]
+    ],
+    "per_class": {
+      "cataract": {
+        "precision": 0.8549222797927462,
+        "recall": 0.8776595744680851,
+        "f1": 0.8661417322834646,
+        "support": 188
+      },
+      "glaucoma": {
+        "precision": 0.8364779874213837,
+        "recall": 0.7348066298342542,
+        "f1": 0.7823529411764706,
+        "support": 181
+      },
+      "normal": {
+        "precision": 0.853448275862069,
+        "recall": 0.9209302325581395,
+        "f1": 0.8859060402684564,
+        "support": 215
+      }
+    },
+    "classification_report": {
+      "cataract": {
+        "precision": 0.8549222797927462,
+        "recall": 0.8776595744680851,
+        "f1-score": 0.8661417322834646,
+        "support": 188.0
+      },
+      "glaucoma": {
+        "precision": 0.8364779874213837,
+        "recall": 0.7348066298342542,
+        "f1-score": 0.7823529411764706,
+        "support": 181.0
+      },
+      "normal": {
+        "precision": 0.853448275862069,
+        "recall": 0.9209302325581395,
+        "f1-score": 0.8859060402684564,
+        "support": 215.0
+      },
+      "accuracy": 0.8493150684931506,
+      "macro avg": {
+        "precision": 0.8482828476920662,
+        "recall": 0.8444654789534929,
+        "f1-score": 0.8448002379094639,
+        "support": 584.0
+      },
+      "weighted avg": {
+        "precision": 0.84866315690865,
+        "recall": 0.8493150684931506,
+        "f1-score": 0.8474491895204636,
+        "support": 584.0
+      }
+    }
+  },
+  "caveats": [
+    "Temperature scaling was fit on the validation split; test metrics are held out from that fit within this newly generated split.",
+    "The checkpoint was trained/selected using this dataset; without original split IDs, the re-created validation and test splits may overlap samples used for training or checkpoint selection. Treat all results as exploratory, not independent test or calibration evidence.",
+    "Re-split test accuracy (84.93%) did not match the notebook's recorded 88.53%; this confirms that the original sample assignments were not reproduced.",
+    "The split is image-level; patient-level independence cannot be verified from the notebook/data layout.",
+    "Only aggregate metrics are written; image paths and per-image outputs are excluded."
+  ]
+}

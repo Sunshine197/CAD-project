@@ -31,7 +31,9 @@ python evaluate.py \
   --output evaluation_metrics.json
 ```
 
-The script reproduces the notebook's stratified 60/20/20 image-level split (`random_state=42`), fits one temperature-scaling parameter on the validation split, and reports aggregate classification and calibration metrics on validation and test data. It excludes per-image scores and image paths from the JSON output. This is intended as an evaluation harness; it cannot certify clinical validity.
+The script creates a deterministic stratified 60/20/20 image-level re-split (`random_state=42`), fits one temperature-scaling parameter on that re-split's validation data, and reports aggregate metrics. It excludes per-image scores and image paths from the JSON output. **It cannot reconstruct the notebook's exact splits unless the original path ordering or split manifest is available.** Since the checkpoint was trained/selected from this dataset, a re-split may overlap training or checkpoint-selection examples; those metrics are exploratory, not independent test/calibration evidence.
+
+The uploaded archive contained 938 cataract JPGs, 906 glaucoma JPGs, and 1,074 normal JPGs, matching the notebook's JPG counts; additional PNG files are ignored to match training preprocessing. The sorted-path re-split produced 84.93% test accuracy, compared with 88.53% recorded in the notebook. Because these differ, the original test assignments have not been reproduced. Do not cite the re-split result as the model's held-out test performance. For valid calibration/evaluation, use the original validation/test sample assignments or a genuinely independent, appropriately governed dataset.
 
 ## Validation performed
 

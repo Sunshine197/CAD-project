@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 import torch
-from PIL import Image, ImageOps
+from PIL import Image
 from torch import nn
 from torchvision import models, transforms
 
@@ -91,7 +91,7 @@ class EyeDiseasePredictor:
     @torch.inference_mode()
     def predict(self, image: Image.Image) -> dict[str, Any]:
         """Return all class softmax scores and traceable model metadata."""
-        image = ImageOps.exif_transpose(image).convert("RGB")
+        image = image.convert("RGB")
         tensor = self.transform(image).unsqueeze(0).to(self.device)
         logits = self.model(tensor)[0]
         scores = torch.softmax(logits, dim=0).detach().cpu().tolist()

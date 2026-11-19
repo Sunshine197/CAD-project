@@ -1,7 +1,10 @@
-"""Held-out evaluation and post-hoc calibration for the eye CAD model.
+"""Exploratory evaluation and post-hoc calibration for the eye CAD model.
 
-Reproduces the notebook's stratified 60/20/20 split (random_state=42) and fits
-temperature scaling on validation only. It reports aggregate metrics on test.
+Creates a deterministic stratified 60/20/20 resplit of current JPG files and
+fits temperature scaling on the resplit's validation data. It does NOT know
+the notebook's original path ordering or saved split assignments. If the
+checkpoint was trained/selected on this source dataset, resulting metrics may
+be contaminated by overlap and must not be treated as independent test results.
 No images, paths, or per-image predictions are written to the output JSON.
 """
 from __future__ import annotations
@@ -12,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from PIL import Image, ImageOps
+from PIL import Image
 from sklearn.metrics import (accuracy_score, classification_report,
                              confusion_matrix, log_loss, precision_recall_fscore_support)
 from sklearn.model_selection import train_test_split
@@ -33,7 +36,7 @@ class ImageDataset(Dataset):
     def __getitem__(self, i):
         path, label = self.entries[i]
         with Image.open(path) as im:
-            im = ImageOps.exif_transpose(im).convert("RGB")
+            im = im.convert("RGB")
             return self.transform(im), label
 
 
@@ -156,7 +159,7 @@ def main():
     temperature = float((0.05 + 19.95 * torch.sigmoid(raw_t.detach())).item())
 
     result = {
-        "evaluation_protocol": "Notebook split reproduction; stratified 60/20/20, random_state=42; temperature fitted on validation only.",
+        "evaluation_protocol": "Exploratory deterministic re-split of current JPG files (lexicographically sorted paths); stratified 60/20/20, random_state=42; temperature fitted on this re-split's validation only. This is not verified to match the notebook's original sample assignments.",
         "classes_in_logit_order": CLASS_NAMES,
         "split_sizes": {"train": len(train), "validation": len(val), "test": len(test)},
         "calibration": {"method": "single scalar temperature scaling", "temperature_fit_on_validation": temperature,
@@ -166,6 +169,8 @@ def main():
         "test_temperature_scaled": metrics(test_logits, y_test, temperature),
         "caveats": [
             "Temperature scaling was fit on the validation split; test metrics are held out from that fit.",
+            "The checkpoint was trained/selected using this dataset; without original split IDs, the re-created validation and test splits may overlap samples used for training or checkpoint selection. Treat all results as exploratory, not independent test or calibration evidence.",
+            "Re-split test accuracy did not match the notebook's recorded 88.53%; this confirms that the original sample assignments were not reproduced.",
             "The split is image-level, as in the notebook; patient-level independence cannot be verified from the notebook/data layout.",
             "This evaluation is not external or clinical validation and does not establish clinical utility.",
             "Only aggregate metrics are written; image paths and per-image outputs are excluded.",
