@@ -43,7 +43,7 @@ except (UnidentifiedImageError, OSError) as exc:
 
 left, right = st.columns([1, 1.25], gap="large")
 with left:
-    st.image(image, caption="Uploaded image", use_container_width=True)
+    st.image(image, caption="Uploaded image", width="stretch")
     st.caption(f"Input dimensions: {image.width} × {image.height} px")
 
 @st.cache_resource(show_spinner="Loading classifier…")
