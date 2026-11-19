@@ -3,3 +3,5 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+fresh_group_split_run/
+split_manifest*.json
